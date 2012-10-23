@@ -42,6 +42,47 @@ function ReadGETnPOSTParam($ParamName,$def_val)
 
  return $def_val;
 }
+    
+    
+//===Multi-Language support===
+$lang_en=array(
+               "Email",
+               "Twitter",
+               "Webibo",
+               "Contact",
+               );
+    $lang_cn=array(
+                   "电子邮件",
+                   "Twitter",
+                   "微博",
+                   "联系"
+                   );
+    $lang_jp=array(
+                   "メール",
+                   "ツイッター",
+                   "Webibo",
+                   "連絡"
+                   );
+    define("DEFLANG_NAME","en");
+    $langs_array=array(
+                       "en"=>$lang_en,
+                       "cn"=>$lang_cn,
+                       "jp"=>$lang_jp
+                       );
+    define("PIDX_CLANG_EMAIL",0);
+    define("PIDX_CLANG_TWITTER",1);
+    define("PIDX_CLANG_WEIBO",2);
+    define("PIDX_CLANG_CONTACT",3);
+    define("PIDX_CLANG_MAX",3);
+    
+function lang_getContent($lang_name,$idx)
+{
+ $lang_arr=$langs_array[$lang_name];
+ if(isset($lang_arr) && $idx<PIDX_CLANG_MAX)
+  return $lang_arr[$idx];
+ else
+  return "";
+}
 
 
 
