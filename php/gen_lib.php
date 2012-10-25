@@ -458,6 +458,33 @@ function EI_RegisterEmail($email,$subject,$msg_front,$identify_url,$msg_back,$fr
   return FALSE;
  }
 }
+    
+function Tweet($login_user,$pwd,$tweet_msg)
+{
+    $status = urlencode(stripslashes(urldecode($tweet_msg)));
+    
+    if ($status) {
+        $tweetUrl = 'http://www.twitter.com/statuses/update.xml';
+        
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, "$tweetUrl");
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 2);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, "status=$status");
+        curl_setopt($curl, CURLOPT_USERPWD, "$login_user:$pwd");
+        
+        $result = curl_exec($curl);
+        $resultArray = curl_getinfo($curl);
+        
+        if ($resultArray['http_code'] == 200)
+            return TRUE;
+        else
+            return FALSE;
+        
+        curl_close($curl);
+    }
+}
 
 //Subscribe manager
 class CSubscribeMgr_Text
