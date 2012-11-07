@@ -55,13 +55,13 @@ $lang_en=array(
                    "电子邮件",
                    "Twitter",
                    "微博",
-                   "联系"
+                   "联系",
                    );
     $lang_jp=array(
                    "メール",
                    "ツイッター",
                    "Webibo",
-                   "連絡"
+                   "連絡",
                    );
     define("DEFLANG_NAME","en");
     $langs_array=array(
@@ -83,6 +83,106 @@ function lang_getContent($lang_name,$idx)
  else
   return "";
 }
+    
+    //Language
+    define("GENLIB_LANGFILE_EXT",".lang");
+    function mlang_readfile($fn)
+    {
+        $lines=file_noCRLF($fn);
+        array_shift($lines);
+        
+        return $lines;
+    }
+    
+    function mlang_retrieve_strings($sub_path,$langid,$prefix = "")
+    {
+        $lang_fn=$sub_path.$prefix.$langid.GENLIB_LANGFILE_EXT;
+        if(file_exists($lang_fn))
+            $lang_strings = mlang_readfile($lang_fn);
+        else{
+            if(file_exists($sub_path.$prefix.DEFLANG_NAME.GENLIB_LANGFILE_EXT))
+                $lang_strings = mlang_readfile($sub_path.DEFLANG_NAME.GENLIB_LANGFILE_EXT);
+        }
+        return $lang_strings;
+    }
+    
+    function mlang_isfile($fn)
+    {
+        return (strlen(strstr($fn,GENLIB_LANGFILE_EXT))==strlen(GENLIB_LANGFILE_EXT));
+    }
+    
+    function mlang_getinfofromfile($fn)
+    {
+        $lines=file_noCRLF($fn);
+        return array(substr($fn,0,strlen($fn)-strlen(GENLIB_LANGFILE_EXT)),$lines[0]);
+    }
+    
+    function mlang_GetIDArray($path)
+    {
+        $lang_arr = array();
+        $files = scandir($path);
+        for($i=0; $i<sizeof($files); $i++){
+            if( mlang_isfile($files[$i]) ){
+                array_push($lang_arr, mlang_getinfofromfile($files[$i]));
+            }
+        }
+        return $lang_arr;
+    }
+    
+    function mlang_ShowSelectionCmb($param_lang,$path="./",$disp_text = "")
+    {
+        $LANG_ID_ARRAY = mlang_GetIDArray($path);
+        $html_code="<form name='lang_sel' method='get'>".$text."<select name='lang' style='font-size:12px' onChange='javascript:submit();'>";
+        for($i=0;$i<sizeof($LANG_ID_ARRAY);$i++){
+            if(strcmp($param_lang,$LANG_ID_ARRAY[$i][0])==0){
+                $html_code=$html_code."<option value='".$param_lang."' selected>".$LANG_ID_ARRAY[$i][1]."</option>\r\n";
+            }else{
+                $html_code=$html_code."<option value='".$LANG_ID_ARRAY[$i][0]."'>".$LANG_ID_ARRAY[$i][1]."</option>\r\n";
+            }
+        }
+        $html_code.="</select>";
+        if(false){
+            $html_code.="<input value='GO' type='button' style='width:25px; font-size:9px' onClick='javascript:submit();'></input>";
+        }
+        $html_code.="</form>";
+        return $html_code;
+    }
+    
+    class CLangMgr
+    {
+        public function __construct($lang=DEFLANG_NAME,$subpath = "")
+        {
+            $this->_strLangName=$lang;
+            $this->_langfile=mlang_retrieve_strings($subpath,$lang);
+        }
+        
+        public function __destruct()
+        {
+        }
+        
+        public function getContent($lang_idx)
+        {
+            $content="";
+            if($lang_idx<PIDX_CLANG_MAX){
+                $lang_arr=$langs_array[$this->_strLangName];
+                if(isset($lang_arr))
+                    $content=$lang_arr[$lang_idx];
+            }else{
+                $content=$_this->langfile[$lang_idx-PIDX_CLANG_MAX];
+            }
+            return $content;
+        }
+        
+        public function getFileContent($lang_idx)
+        {
+            $content=$_this->langfile[$lang_idx-PIDX_CLANG_MAX];
+            
+            return $content;
+        }
+        
+        private $_strLangName;
+        private $_langfile;
+    }
 
 
 
@@ -152,71 +252,6 @@ function gen_CreareClassByname($class_name)
  $object = new $class();
  
  return $object;
-}
-
-
-//Language 
-define("GENLIB_LANGFILE_EXT",".lang");
-function mlang_readfile($fn)
-{
- $lines=file_noCRLF($fn);
- array_shift($lines);
-
- return $lines;
-}
-
-function mlang_retrieve_strings($sub_path,$langid,$prefix = "")
-{
- $lang_fn=$sub_path.$prefix.$langid.GENLIB_LANGFILE_EXT;
- if(file_exists($lang_fn))
-  $lang_strings = mlang_readfile($lang_fn);
- else{
-  if(file_exists($sub_path.$prefix."en".GENLIB_LANGFILE_EXT))
-   $lang_strings = mlang_readfile($sub_path."en".GENLIB_LANGFILE_EXT);
- }
- return $lang_strings;
-}
-
-function mlang_isfile($fn)
-{
- return (strlen(strstr($fn,GENLIB_LANGFILE_EXT))==strlen(GENLIB_LANGFILE_EXT));
-}
-
-function mlang_getinfofromfile($fn)
-{
- $lines=file_noCRLF($fn);
- return array(substr($fn,0,strlen($fn)-strlen(GENLIB_LANGFILE_EXT)),$lines[0]);
-}
-
-function mlang_GetIDArray($path)
-{
- $lang_arr = array();
- $files = scandir($path);
- for($i=0; $i<sizeof($files); $i++){
-  if( mlang_isfile($files[$i]) ){
-   array_push($lang_arr, mlang_getinfofromfile($files[$i]));
-  }
- }
- return $lang_arr;
-}
-
-function mlang_ShowSelectionCmb($param_lang,$path="./",$disp_text = "")
-{
- $LANG_ID_ARRAY = mlang_GetIDArray($path);
- $html_code="<form name='lang_sel' method='get'>".$text."<select name='lang' style='font-size:12px' onChange='javascript:submit();'>";
- for($i=0;$i<sizeof($LANG_ID_ARRAY);$i++){
-  if(strcmp($param_lang,$LANG_ID_ARRAY[$i][0])==0){
-   $html_code=$html_code."<option value='".$param_lang."' selected>".$LANG_ID_ARRAY[$i][1]."</option>\r\n";
-  }else{
-   $html_code=$html_code."<option value='".$LANG_ID_ARRAY[$i][0]."'>".$LANG_ID_ARRAY[$i][1]."</option>\r\n";
-  }
- }
- $html_code.="</select>";
- if(false){
-  $html_code.="<input value='GO' type='button' style='width:25px; font-size:9px' onClick='javascript:submit();'></input>";
- }
- $html_code.="</form>";
- return $html_code;
 }
 
 
@@ -464,6 +499,7 @@ function Tweet($login_user,$pwd,$tweet_msg)
     $status = urlencode(stripslashes(urldecode($tweet_msg)));
     
     if ($status) {
+        //http://www.twitter.com/statuses/timeline.xml
         $tweetUrl = 'http://www.twitter.com/statuses/update.xml';
         
         $curl = curl_init();
@@ -477,6 +513,10 @@ function Tweet($login_user,$pwd,$tweet_msg)
         $result = curl_exec($curl);
         $resultArray = curl_getinfo($curl);
         
+        
+        echo $result;
+        echo $resultArray['http_code'];
+        echo $resultArray['Location'];
         if ($resultArray['http_code'] == 200)
             return TRUE;
         else
@@ -484,7 +524,68 @@ function Tweet($login_user,$pwd,$tweet_msg)
         
         curl_close($curl);
     }
+    return FALSE;
 }
+ 
+    //HTTP request sender class.
+    class CHttpReq
+    {
+        public function __construct()
+        {
+            $this->m_curl = curl_init();
+        }
+        
+        public function __destruct()
+        {
+            if($this->m_curl!=FALSE)
+                curl_close($this->m_curl);
+        }
+        
+        public function setOpt($key,$val)
+        {
+            return curl_setopt($this->m_curl,$key,$val);
+        }
+        
+        public function sendPost($url,$param_array)
+        {
+            $this->setOpt(CURLOPT_POST, 1);
+            
+            return $this->send($url);
+        }
+        
+        public function sendGet($url,$param_array)
+        {
+            $this->setOpt(CURLOPT_HTTPGET, 1);
+            
+            return $this->send($url);
+        }
+        
+        public function getInfo()
+        {
+            return curl_getinfo($this->m_curl);
+        }
+        
+        public function getCurl()
+        {
+            return $this->m_curl;
+        }
+        
+        private function setOpts($params_array)
+        {
+            foreach ($params_array as $key => $val) {
+                $this->setOpts($key,$val);
+            }
+        }
+        
+        private function send($url)
+        {
+            $this->setOpt(CURLOPT_URL, "$url");
+            
+            return curl_exec($this->m_curl);
+        }
+        
+        private $m_curl;
+    };
 
 //Subscribe manager
 class CSubscribeMgr_Text
