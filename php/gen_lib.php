@@ -44,51 +44,70 @@ function ReadGETnPOSTParam($ParamName,$def_val)
 }
     
     
+    //======File Function=======
+    function file_noCRLF($fn)
+    {
+        $lines=file($fn);
+        for($i=0;$i<sizeof($lines);$i++){
+            $lines[$i]=trim($lines[$i],"\r\n");
+        }
+        return $lines;
+    }
+    
+    function File_CompareDate($file1,$file2)
+    {
+        if(!file_exists($file1) || !file_exists($file2)){
+            return 0;
+        }
+        $date1=filectime($file1);
+        $date2=filectime($file2);
+        
+        return ($date1-$date2);
+    }
+    
+    function deleteDir($dir)
+    {
+        if(substr($dir, strlen($dir)-1, 1)!='/')
+            $dir .= '/';
+        
+        if($handle=opendir($dir)){
+            while($obj=readdir($handle)){
+                if($obj!='.' && $obj!='..'){
+                    if(is_dir($dir.$obj)){
+                        if(!deleteDir($dir.$obj))
+                            return false;
+                    }elseif(is_file($dir.$obj)){
+                        if(!unlink($dir.$obj))
+                            return false;
+                    }
+                }
+            }
+            closedir($handle);
+            if(!@rmdir($dir))
+                return false;
+            return true;
+        }
+        return false;
+    }
+    
+    function fopen_maxsize($fn,$mode,$max_size)
+    {
+        if(file_exists($fn)){
+            if(filesize($fn)>=$max_size){
+                $new_fn=$fn.date('Y_m_j_h_i_s');
+                rename($fn,$new_fn);
+            }
+        }
+        return fopen($fn,$mode);
+    }
+    
+    
 //===Multi-Language support===
-$lang_en=array(
-               "Email",
-               "Twitter",
-               "Webibo",
-               "Contact",
-               );
-    $lang_cn=array(
-                   "电子邮件",
-                   "Twitter",
-                   "微博",
-                   "联系",
-                   );
-    $lang_jp=array(
-                   "メール",
-                   "ツイッター",
-                   "Webibo",
-                   "連絡",
-                   );
-    define("DEFLANG_NAME","en");
-    $langs_array=array(
-                       "en"=>$lang_en,
-                       "cn"=>$lang_cn,
-                       "jp"=>$lang_jp
-                       );
-    define("PIDX_CLANG_EMAIL",0);
-    define("PIDX_CLANG_TWITTER",1);
-    define("PIDX_CLANG_WEIBO",2);
-    define("PIDX_CLANG_CONTACT",3);
-    define("PIDX_CLANG_MAX",3);
-    
-function lang_getContent($lang_name,$idx)
-{
- $lang_arr=$langs_array[$lang_name];
- if(isset($lang_arr) && $idx<PIDX_CLANG_MAX)
-  return $lang_arr[$idx];
- else
-  return "";
-}
-    
-    //Language
     define("GENLIB_LANGFILE_EXT",".lang");
     function mlang_readfile($fn)
     {
         $lines=file_noCRLF($fn);
+        //Skip the first language name row.
         array_shift($lines);
         
         return $lines;
@@ -97,11 +116,12 @@ function lang_getContent($lang_name,$idx)
     function mlang_retrieve_strings($sub_path,$langid,$prefix = "")
     {
         $lang_fn=$sub_path.$prefix.$langid.GENLIB_LANGFILE_EXT;
-        if(file_exists($lang_fn))
+        if(file_exists($lang_fn)){
             $lang_strings = mlang_readfile($lang_fn);
-        else{
-            if(file_exists($sub_path.$prefix.DEFLANG_NAME.GENLIB_LANGFILE_EXT))
+        }else{
+            if(file_exists($sub_path.$prefix.DEFLANG_NAME.GENLIB_LANGFILE_EXT)){
                 $lang_strings = mlang_readfile($sub_path.DEFLANG_NAME.GENLIB_LANGFILE_EXT);
+            }
         }
         return $lang_strings;
     }
@@ -148,8 +168,41 @@ function lang_getContent($lang_name,$idx)
         return $html_code;
     }
     
+    define("DEFLANG_NAME","en");
+    define("PIDX_CLANG_EMAIL",0);
+    define("PIDX_CLANG_TWITTER",1);
+    define("PIDX_CLANG_WEIBO",2);
+    define("PIDX_CLANG_CONTACT",3);
+    define("PIDX_CLANG_SOCIAL",4);
+    define("PIDX_CLANG_MAX",4);
+    
     class CLangMgr
     {
+        
+        private static $langs_array=array(
+                                          "en"=>array(
+                                                      "Email",
+                                                      "Twitter",
+                                                      "Webibo",
+                                                      "Contact",
+                                                      "Social",
+                                                      ),
+                                          "cn"=>array(
+                                                      "电子邮件",
+                                                      "Twitter",
+                                                      "微博",
+                                                      "联系",
+                                                      "Social",
+                                                      ),
+                                          "jp"=>array(
+                                                      "メール",
+                                                      "ツイッター",
+                                                      "Webibo",
+                                                      "連絡",
+                                                      "ソーシャル",
+                                                      )
+                           );
+        
         public function __construct($lang=DEFLANG_NAME,$subpath = "")
         {
             $this->_strLangName=$lang;
@@ -163,8 +216,8 @@ function lang_getContent($lang_name,$idx)
         public function getContent($lang_idx)
         {
             $content="";
-            if($lang_idx<PIDX_CLANG_MAX){
-                $lang_arr=$langs_array[$this->_strLangName];
+            if($lang_idx<=PIDX_CLANG_MAX){
+                $lang_arr=CLangMgr::$langs_array[$this->_strLangName];
                 if(isset($lang_arr))
                     $content=$lang_arr[$lang_idx];
             }else{
@@ -175,7 +228,7 @@ function lang_getContent($lang_name,$idx)
         
         public function getFileContent($lang_idx)
         {
-            $content=$_this->langfile[$lang_idx-PIDX_CLANG_MAX];
+            $content=$this->_langfile[$lang_idx];
             
             return $content;
         }
@@ -183,65 +236,6 @@ function lang_getContent($lang_name,$idx)
         private $_strLangName;
         private $_langfile;
     }
-
-
-
-//======File Function=======
-function file_noCRLF($fn)
-{
- $lines=file($fn);
- for($i=0;$i<sizeof($lines);$i++){
-  $lines[$i]=trim($lines[$i],"\r\n");
- }
- return $lines;
-}
-
-function File_CompareDate($file1,$file2)
-{
- if(!file_exists($file1) || !file_exists($file2)){
-  return 0;
- }
- $date1=filectime($file1);
- $date2=filectime($file2);
- 
- return ($date1-$date2);
-}
-
-function deleteDir($dir)
-{
-   if(substr($dir, strlen($dir)-1, 1)!='/')
-       $dir .= '/';
-	   
-   if($handle=opendir($dir)){
-       while($obj=readdir($handle)){
-           if($obj!='.' && $obj!='..'){
-               if(is_dir($dir.$obj)){
-                   if(!deleteDir($dir.$obj))
-                       return false;
-               }elseif(is_file($dir.$obj)){
-                   if(!unlink($dir.$obj))
-                       return false;
-               }
-           }
-       }
-       closedir($handle);
-       if(!@rmdir($dir))
-           return false;
-       return true;
-   }
-   return false;
-}
-
-function fopen_maxsize($fn,$mode,$max_size)
-{
-  if(file_exists($fn)){
-   if(filesize($fn)>=$max_size){
-	$new_fn=$fn.date('Y_m_j_h_i_s');
-    rename($fn,$new_fn);
-   }
-  }
-  return fopen($fn,$mode);
-}
 
 
 
@@ -514,7 +508,7 @@ function Tweet($login_user,$pwd,$tweet_msg)
         $resultArray = curl_getinfo($curl);
         
         
-        echo $result;
+        var_dump($result);
         echo $resultArray['http_code'];
         echo $resultArray['Location'];
         if ($resultArray['http_code'] == 200)
