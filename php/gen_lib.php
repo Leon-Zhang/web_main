@@ -175,7 +175,8 @@ function ReadGETnPOSTParam($ParamName,$def_val)
     define("PIDX_CLANG_CONTACT",3);
     define("PIDX_CLANG_SOCIAL",4);
     define("PIDX_CLANG_EMAILREPLACE",5);
-    define("PIDX_CLANG_MAX",5);
+    define("PIDX_CLANG_ABOUT",6);
+    define("PIDX_CLANG_MAX",6);
     
     class CLangMgr
     {
@@ -188,6 +189,7 @@ function ReadGETnPOSTParam($ParamName,$def_val)
                                                       "Contact",
                                                       "Social",
                                                       "Please replace 'at' with @",
+                                                      "About",
                                                       ),
                                           "cn"=>array(
                                                       "电子邮件",
@@ -196,6 +198,7 @@ function ReadGETnPOSTParam($ParamName,$def_val)
                                                       "联系",
                                                       "Social",
                                                       "请将'at'替换为@",
+                                                      "关于",
                                                       ),
                                           "jp"=>array(
                                                       "メール",
@@ -204,6 +207,7 @@ function ReadGETnPOSTParam($ParamName,$def_val)
                                                       "連絡",
                                                       "ソーシャル",
                                                       "'at'を@に替えてください",
+                                                      "アバウト",
                                                       )
                            );
         
