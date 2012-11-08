@@ -174,7 +174,8 @@ function ReadGETnPOSTParam($ParamName,$def_val)
     define("PIDX_CLANG_WEIBO",2);
     define("PIDX_CLANG_CONTACT",3);
     define("PIDX_CLANG_SOCIAL",4);
-    define("PIDX_CLANG_MAX",4);
+    define("PIDX_CLANG_EMAILREPLACE",5);
+    define("PIDX_CLANG_MAX",5);
     
     class CLangMgr
     {
@@ -186,6 +187,7 @@ function ReadGETnPOSTParam($ParamName,$def_val)
                                                       "Webibo",
                                                       "Contact",
                                                       "Social",
+                                                      "Please replace 'at' with @",
                                                       ),
                                           "cn"=>array(
                                                       "电子邮件",
@@ -193,6 +195,7 @@ function ReadGETnPOSTParam($ParamName,$def_val)
                                                       "微博",
                                                       "联系",
                                                       "Social",
+                                                      "请将'at'替换为@",
                                                       ),
                                           "jp"=>array(
                                                       "メール",
@@ -200,6 +203,7 @@ function ReadGETnPOSTParam($ParamName,$def_val)
                                                       "Webibo",
                                                       "連絡",
                                                       "ソーシャル",
+                                                      "'at'を@に替えてください",
                                                       )
                            );
         
@@ -510,7 +514,6 @@ function Tweet($login_user,$pwd,$tweet_msg)
         
         var_dump($result);
         echo $resultArray['http_code'];
-        echo $resultArray['Location'];
         if ($resultArray['http_code'] == 200)
             return TRUE;
         else
