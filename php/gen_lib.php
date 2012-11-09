@@ -176,7 +176,8 @@ function ReadGETnPOSTParam($ParamName,$def_val)
     define("PIDX_CLANG_SOCIAL",4);
     define("PIDX_CLANG_EMAILREPLACE",5);
     define("PIDX_CLANG_ABOUT",6);
-    define("PIDX_CLANG_MAX",6);
+	define("PIDX_CLANG_TENCENT",7);
+    define("PIDX_CLANG_MAX",7);
     
     class CLangMgr
     {
@@ -185,11 +186,12 @@ function ReadGETnPOSTParam($ParamName,$def_val)
                                           "en"=>array(
                                                       "Email",
                                                       "Twitter",
-                                                      "Webibo",
+                                                      "Weibo",
                                                       "Contact",
                                                       "Social",
                                                       "Please replace 'at' with @",
                                                       "About",
+													  "Tencent",
                                                       ),
                                           "cn"=>array(
                                                       "电子邮件",
@@ -199,15 +201,17 @@ function ReadGETnPOSTParam($ParamName,$def_val)
                                                       "Social",
                                                       "请将'at'替换为@",
                                                       "关于",
+													  "腾讯",
                                                       ),
                                           "jp"=>array(
                                                       "メール",
                                                       "ツイッター",
-                                                      "Webibo",
+                                                      "Weibo",
                                                       "連絡",
                                                       "ソーシャル",
                                                       "'at'を@に替えてください",
                                                       "アバウト",
+													  "テンセント",
                                                       )
                            );
         
