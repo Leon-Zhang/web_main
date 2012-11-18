@@ -152,3 +152,12 @@ strResponseSuffix)
     }
     self.xmlHttpReq.send(strVars);
 }
+
+function ShowHideDiv(id)
+{
+ lay=document.getElementById(id);
+ if(lay.style.visibility=="visible")
+	lay.style.visibility="hidden";
+ else
+	lay.style.visibility="visible";
+}
