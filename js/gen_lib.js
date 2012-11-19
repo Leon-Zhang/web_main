@@ -161,3 +161,13 @@ function ShowHideDiv(id)
  else
 	lay.style.visibility="visible";
 }
+
+//function AlignElementPos(elem_align_name,elem_host_name,top_off,left_off,right_off,bottom_off)
+function AlignElementPos(elem_align_name,elem_host_name)
+{
+ elem_align=document.getElementById(elem_align_name);
+ elem_host=document.getElementById(elem_host_name);
+ 
+ elem_align.style.top=elem_host.style.top;
+ elem_align.style.right=elem_host.style.width;
+}
