@@ -156,10 +156,13 @@ strResponseSuffix)
 function ShowHideDiv(id)
 {
  lay=document.getElementById(id);
- if(lay.style.visibility=="visible")
+ if(lay.style.visibility=="visible"){
 	lay.style.visibility="hidden";
- else
+	lay.style.display="none";
+ }else{
 	lay.style.visibility="visible";
+	lay.style.display="inline";
+ }
 }
 
 //function AlignElementPos(elem_align_name,elem_host_name,top_off,left_off,right_off,bottom_off)
